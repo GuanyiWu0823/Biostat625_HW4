@@ -45,8 +45,8 @@ test_that("my_lm_original matches lm coefficients", {
   fit_my_original <- my_lm_original(y ~ x1 + x2, data = dat)
 
   expect_equal(
-    unname(coef(fit_lm)),
-    unname(fit_my_original$coefficients),
-    tolerance = 1e-6
+    as.numeric(fit_my_original$coefficients),
+    as.numeric(coef(fit_lm)),
+    tolerance = 1e-8
   )
 })
