@@ -1,6 +1,7 @@
 # Biostat625HW4
 <!-- badges: start -->
   [![R-CMD-check](https://github.com/GuanyiWu0823/Biostat625_HW4/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/GuanyiWu0823/Biostat625_HW4/actions/workflows/R-CMD-check.yaml)
+  [![codecov](https://codecov.io/gh/GuanyiWu0823/Biostat625_HW4/branch/main/graph/badge.svg)](https://codecov.io/gh/GuanyiWu0823/Biostat625_HW4)
   <!-- badges: end -->
 This R package was developed as part of Biostat 625 coursework. It implements custom statistical modeling functions, acceleration via Rcpp, unit testing, vignettes, and complete package documentation.
 
