@@ -64,3 +64,6 @@ fit
 ```r
 my_summary(fit)
 ```
+ <!-- badges: start -->
+  [![R-CMD-check](https://github.com/GuanyiWu0823/Biostat625_HW4/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/GuanyiWu0823/Biostat625_HW4/actions/workflows/R-CMD-check.yaml)
+  <!-- badges: end -->
