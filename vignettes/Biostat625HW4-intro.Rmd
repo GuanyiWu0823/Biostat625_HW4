@@ -1,0 +1,103 @@
+---
+title: "Biostat625HW4: Fast Linear Regression with Rcpp"
+author: "Guanyi Wu"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Biostat625HW4-intro}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r}
+library(Biostat625HW4)
+set.seed(2025)
+```
+This package provides an implementation of linear regression using Rcpp and RcppArmadillo. This tutorial introduces the main functions, demonstrates basic usage, compares the results with the base R function `lm()`, evaluates efficiency, and illustrates practical applications using simulated data.
+
+The key functions included in this package are:
+
+-   `my_lm()`: A linear regression model estimated based on least squares and using C++ for efficient matrix operation, returns results in a structure similar to `lm()`
+-   `my_summary()`: A custom summary function designed to display coefficient estimates, standard errors, t-values and p-values for model objects created by `my_lm()`.
+
+# 1. Basic Usage
+
+We begin by demonstrating how to fit a linear regression model using `my_lm()`.
+
+```{r}
+n <- 100
+x1 <- rnorm(n)
+x2 <- rnorm(n)
+y <- 1 + 2 * x1 - 3 * x2 + rnorm(n, sd = 0.5)
+
+dat <- data.frame(y = y, x1 = x1, x2 = x2)
+
+fit <- my_lm(y ~ x1 + x2, data = dat)
+
+my_summary(fit)
+```
+
+The output includes the estimated coefficients, standard errors, t-values, and the residual standard error.
+
+# 2. Correctness Comparison with `lm()`
+
+To verify that the implementation is correct, we compare our results with the base R function `lm()`.
+
+```{r}
+fit_lm <- lm(y ~ x1 + x2, data = dat)
+
+coef_lm <- coef(fit_lm)
+coef_my <- fit$coefficients
+
+all.equal(unname(coef_lm), unname(coef_my), tolerance = 1e-6)
+```
+
+Visualization
+```{r coef-plot, fig.height=4, fig.width=6}
+coef_df <- data.frame(
+  method = rep(c("lm", "my_lm"), each = length(coef_lm)),
+  coefficient = rep(names(coef_lm), 2),
+  value = c(coef_lm, coef_my)
+)
+
+library(ggplot2)
+
+ggplot(coef_df, aes(x = coefficient, y = value, 
+                    color = method, group = method)) +
+  geom_point(size = 3) +
+  geom_line() +
+  labs(title = "Comparison of Estimated Coefficients",
+       y = "Coefficient Value",
+       x = "Coefficient") +
+  theme_minimal(base_size = 14)
+```
+
+# 3. Efficiency Comparison
+
+Below we benchmark the execution time of `my_lm()` against `lm()` and `my_lm_original()`(without using Rcpp) on a larger dataset.
+
+```{r}
+library(microbenchmark)
+
+n <- 1e5
+p <- 5
+X <- replicate(p, rnorm(n))
+colnames(X) <- paste0("x", 1:p)
+
+beta_true <- 1:(p + 1)
+dat_big <- as.data.frame(X)
+dat_big$y <- beta_true[1] + as.matrix(X) %*% beta_true[-1] + rnorm(n)
+
+microbenchmark(
+my_lm = my_lm(y ~ ., data = dat_big),
+my_lm_original = my_lm_original(y~.,data=dat_big),
+lm = lm(y ~ ., data = dat_big),
+times = 10
+)
+```
