@@ -2,18 +2,54 @@
 % Please edit documentation in R/my_lm_original.R
 \name{my_lm_original}
 \alias{my_lm_original}
-\title{A pure R implementation without Rcpp}
+\title{Fit Linear Models (Pure R Implementation)}
 \usage{
 my_lm_original(formula, data)
 }
 \arguments{
-\item{formula}{An object of class "formula"}
+\item{formula}{a model formula specifying the regression structure.}
 
-\item{data}{A data.frame containing the variables in the model}
+\item{data}{a \code{data.frame} containing variables used in the model.}
 }
 \value{
-An object of class "my_lm" similar to lm() output
+A list of class \code{"my_lm"} containing:
+
+\itemize{
+\item \code{coefficients}
+\item \code{residuals}
+\item \code{fitted.values}
+\item \code{sigma2}
+\item \code{se}
+\item \code{tvalue}
+\item \code{pvalue}
+\item \code{df}
+\item \code{formula}
+\item \code{X}
+\item \code{y}
+}
 }
 \description{
-A pure R implementation without Rcpp
+\code{my_lm_original()} fits a linear regression model using ordinary least squares (OLS),
+implemented entirely in base R (no Rcpp acceleration).
+}
+\details{
+This function performs the following computations:
+
+\itemize{
+\item Extracts model components (\code{model.frame}, \code{model.matrix}, \code{model.response})
+\item Computes OLS estimator: \eqn{(X^T X)^{-1} X^T y}
+\item Derives standard errors, t-values, p-values
+\item Constructs residuals and fitted values
+}
+
+It is functionally equivalent to \code{my_lm()}, but slower due to lack of Rcpp.
+}
+\examples{
+n <- 50
+x <- rnorm(n)
+y <- 1 + 4*x + rnorm(n)
+dat <- data.frame(y, x)
+fit <- my_lm_original(y ~ x, data = dat)
+fit$coefficients
+
 }

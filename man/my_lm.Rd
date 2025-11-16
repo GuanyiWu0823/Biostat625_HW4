@@ -2,29 +2,54 @@
 % Please edit documentation in R/my_lm.R
 \name{my_lm}
 \alias{my_lm}
-\title{Fast linear model using RcppArmadillo}
+\title{Fit Linear Models (Rcpp-Accelerated)}
 \usage{
 my_lm(formula, data)
 }
 \arguments{
-\item{formula}{An object of class "formula"}
+\item{formula}{an object of class \code{"formula"} specifying the model to be fitted.}
 
-\item{data}{A data.frame containing the variables in the model}
+\item{data}{a \code{data.frame} containing the variables referenced in \code{formula}.}
 }
 \value{
-An object of class "my_lm" similar to lm() output
+An object of class \code{"my_lm"}, which is a list containing:
+
+\itemize{
+\item \code{coefficients} — estimated regression coefficients
+\item \code{residuals} — residuals: \emph{y - fitted}
+\item \code{fitted.values} — fitted means
+\item \code{sigma2} — residual variance estimate
+\item \code{se} — standard errors of coefficients
+\item \code{tvalue} — t-statistics
+\item \code{pvalue} — two-sided p-values
+\item \code{df} — residual degrees of freedom
+\item \code{formula} — the original model formula
+\item \code{X} — model matrix
+\item \code{y} — response vector
+}
 }
 \description{
-A simplified version of lm() that uses RcppArmadillo for the core
-linear algebra. Supports formulas of the form y ~ x1 + x2 + ...
+\code{my_lm()} fits a linear regression model using ordinary least squares (OLS).
+This version is accelerated using Rcpp for faster matrix operations.
+}
+\details{
+The function extracts the model matrix and response via \code{model.frame()},
+\code{model.matrix()}, and \code{model.response()}.
+OLS coefficients are computed as:
+
+\deqn{\hat{\beta} = (X^T X)^{-1} X^T y}
+
+Standard errors, t-values, p-values, fitted values and residuals
+are computed following standard OLS formulas.
 }
 \examples{
-\dontrun{
-  set.seed(1)
-  x <- rnorm(100)
-  y <- 1 + 2 * x + rnorm(100, sd = 0.5)
-  df <- data.frame(x = x, y = y)
-  fit <- my_lm(y ~ x, df)
-  summary(fit)
-}
+n <- 100
+x1 <- rnorm(n)
+x2 <- rnorm(n)
+y <- 1 + 2*x1 - 3*x2 + rnorm(n)
+dat <- data.frame(y, x1, x2)
+
+fit <- my_lm(y ~ x1 + x2, data = dat)
+fit$coefficients
+
 }

@@ -2,18 +2,36 @@
 % Please edit documentation in R/my_summary.R
 \name{my_summary}
 \alias{my_summary}
-\title{Summary method for my_lm objects}
+\title{Summary Method for my_lm Objects}
 \usage{
-my_summary(object, ...)
+my_summary(object)
 }
 \arguments{
-\item{object}{An object of class "my_lm"}
-
-\item{...}{Not used}
+\item{object}{an object of class \code{"my_lm"} produced by \code{my_lm()} or \code{my_lm_original()}.}
 }
 \value{
-Invisibly returns a list with coefficient table, etc.
+Invisibly returns the input \code{"my_lm"} object after printing its summary.
 }
 \description{
-Summary method for my_lm objects
+\code{my_summary()} produces a summary of a fitted linear model object
+created by \code{my_lm()} or \code{my_lm_original()}.
+}
+\details{
+The function prints:
+
+\itemize{
+\item model call
+\item coefficient table (Estimate, Std.Error, t-value, p-value)
+\item residual standard error
+}
+}
+\examples{
+n <- 100
+x <- rnorm(n)
+y <- 3 + 2*x + rnorm(n)
+dat <- data.frame(y, x)
+fit <- my_lm(y ~ x, data = dat)
+
+my_summary(fit)
+
 }

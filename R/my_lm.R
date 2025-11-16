@@ -1,23 +1,57 @@
-#' Fast linear model using RcppArmadillo
+#' Fit Linear Models (Rcpp-Accelerated)
 #'
-#' A simplified version of lm() that uses RcppArmadillo for the core
-#' linear algebra. Supports formulas of the form y ~ x1 + x2 + ...
+#' @description
+#' `my_lm()` fits a linear regression model using ordinary least squares (OLS).
+#' This version is accelerated using Rcpp for faster matrix operations.
 #'
-#' @param formula An object of class "formula"
-#' @param data A data.frame containing the variables in the model
+#' @usage
+#' my_lm(formula, data)
 #'
-#' @return An object of class "my_lm" similar to lm() output
+#' @param formula
+#' an object of class `"formula"` specifying the model to be fitted.
+#'
+#' @param data
+#' a `data.frame` containing the variables referenced in `formula`.
+#'
+#' @details
+#' The function extracts the model matrix and response via `model.frame()`,
+#' `model.matrix()`, and `model.response()`.
+#' OLS coefficients are computed as:
+#'
+#' \deqn{\hat{\beta} = (X^T X)^{-1} X^T y}
+#'
+#' Standard errors, t-values, p-values, fitted values and residuals
+#' are computed following standard OLS formulas.
+#'
+#' @return
+#' An object of class `"my_lm"`, which is a list containing:
+#'
+#' \itemize{
+#'   \item `coefficients` — estimated regression coefficients
+#'   \item `residuals` — residuals: *y - fitted*
+#'   \item `fitted.values` — fitted means
+#'   \item `sigma2` — residual variance estimate
+#'   \item `se` — standard errors of coefficients
+#'   \item `tvalue` — t-statistics
+#'   \item `pvalue` — two-sided p-values
+#'   \item `df` — residual degrees of freedom
+#'   \item `formula` — the original model formula
+#'   \item `X` — model matrix
+#'   \item `y` — response vector
+#' }
+#'
+#' @examples
+#' n <- 100
+#' x1 <- rnorm(n)
+#' x2 <- rnorm(n)
+#' y <- 1 + 2*x1 - 3*x2 + rnorm(n)
+#' dat <- data.frame(y, x1, x2)
+#'
+#' fit <- my_lm(y ~ x1 + x2, data = dat)
+#' fit$coefficients
+#'
 #' @export
 #' @importFrom stats model.frame model.matrix model.response pt
-#' @examples
-#' \dontrun{
-#'   set.seed(1)
-#'   x <- rnorm(100)
-#'   y <- 1 + 2 * x + rnorm(100, sd = 0.5)
-#'   df <- data.frame(x = x, y = y)
-#'   fit <- my_lm(y ~ x, df)
-#'   summary(fit)
-#' }
 my_lm <- function(formula, data) {
   mf <- stats::model.frame(formula, data)
   y  <- stats::model.response(mf)
